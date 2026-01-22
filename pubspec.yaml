@@ -1,0 +1,38 @@
+name: pharma_ease_app
+description: 买药 Mini App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  shared_preferences: ^2.2.2
+  http: ^1.1.0
+  cached_network_image: ^3.3.0
+  firebase_core: ^2.15.1
+  firebase_storage: ^11.2.6
+  cloud_firestore: ^4.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/images/五官用药/
+    - assets/images/感冒用药/
+    - assets/images/消化系统/
+    - assets/images/消炎药/
+    - assets/images/男士用药/
+    - assets/images/皮肤用药/
+    - assets/images/日常用品/
+    - assets/images/钙片/
+    - assets/images/妇科用药/
+    - assets/images/儿童用药/
