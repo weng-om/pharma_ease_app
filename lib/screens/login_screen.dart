@@ -15,6 +15,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // 验证手机号格式
+  bool _validatePhone(String phone) {
+    return phone.length == 11 && RegExp(r'^1[3-9]\d{9}$').hasMatch(phone);
+  }
+
   // 处理登录逻辑
   Future<void> _login() async {
     final phone = _phoneController.text.trim();
@@ -22,6 +27,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入手机号和密码')));
+      return;
+    }
+
+    // 验证手机号是否为11位
+    if (!_validatePhone(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入正确的11位手机号')));
       return;
     }
 
@@ -55,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('药店管理系统', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF5FCCC3))),
+              const Text('药送送', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF5FCCC3))),
               const SizedBox(height: 48),
               TextField(
                 controller: _phoneController,

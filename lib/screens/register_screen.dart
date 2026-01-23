@@ -22,12 +22,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return phone.length == 11 && RegExp(r'^1[3-9]\d{9}$').hasMatch(phone);
   }
 
-  // 验证密码格式
+  // 验证密码格式（必须是字母+数字）
   bool _validatePassword(String password) {
     if (password.length < 6) return false;
     bool hasLetter = RegExp(r'[a-zA-Z]').hasMatch(password);
     bool hasDigit = RegExp(r'[0-9]').hasMatch(password);
-    return hasLetter && hasDigit;
+    // 确保密码中只包含字母和数字
+    bool onlyLetterAndDigit = RegExp(r'^[a-zA-Z0-9]+$').hasMatch(password);
+    return hasLetter && hasDigit && onlyLetterAndDigit;
+  }
+
+  // 检查用户名是否已存在
+  Future<bool> _isUsernameTaken(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    // 获取所有已注册的用户手机号
+    final allKeys = prefs.getKeys();
+    for (var key in allKeys) {
+      if (key.startsWith('userName_')) {
+        final existingUsername = prefs.getString(key);
+        if (existingUsername == username) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   // 处理注册逻辑
@@ -37,27 +55,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
+    // 验证所有字段是否填写
     if (username.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请填写完整信息')));
       return;
     }
 
+    // 验证手机号是否为11位
     if (!_validatePhone(phone)) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('请输入正确的11位手机号')));
       return;
     }
 
+    // 验证密码格式（必须是字母+数字）
     if (!_validatePassword(password)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('密码需至少6位且包含字母和数字')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('密码必须包含字母和数字，且至少6位')));
       return;
     }
 
+    // 验证两次密码是否一致
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('两次输入的密码不一致')));
       return;
     }
 
     final prefs = await SharedPreferences.getInstance();
+
+    // 检查用户名是否已被注册
+    if (await _isUsernameTaken(username)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('该用户名已被注册，请使用其他用户名')));
+      return;
+    }
 
     // 检查手机号是否已注册
     if (prefs.containsKey('password_$phone')) {
@@ -86,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('会员注册')),
+      appBar: AppBar(title: const Text('用户注册')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
